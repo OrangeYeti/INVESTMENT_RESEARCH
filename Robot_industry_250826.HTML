@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인터랙티브 로봇 산업 분석</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Warm Neutrals with Muted Blue/Teal Accent) -->
+    <!-- Application Structure Plan: A thematic, single-page dashboard designed for non-linear exploration. The structure begins with a high-level summary, then dives into the primary market catalyst (Yellow Envelope Law) with interactive cards. It follows with a data-driven market overview using toggleable charts. The core of the app is a side-by-side comparative analysis of the key strategic players (Tesla vs. NVIDIA). It concludes with a filterable gallery of key companies and an interactive risk matrix. This structure was chosen to guide the user from the 'why now' (catalyst) to the 'what' (market size), the 'how' (strategies), and finally the 'who and what-if' (players & risks), creating a more intuitive and insightful user journey than a linear report. -->
+    <!-- Visualization & Content Choices: 1. Market Catalyst: Report's Table 1 -> Goal: Explain impact -> Viz: Interactive HTML cards -> Interaction: Click to reveal robot types -> Justification: More engaging than a static table. 2. Market Growth: Report's market size data -> Goal: Compare segments -> Viz: Chart.js Bar Chart -> Interaction: Buttons to toggle data -> Justification: Dynamic exploration of data. 3. Tesla vs. NVIDIA: Report's Table 2 -> Goal: Compare strategies -> Viz: Two-column HTML layout with styled cards -> Interaction: Visual comparison -> Justification: Instantly highlights strategic differences. 4. Key Players: Report's company profiles -> Goal: Inform about investment targets -> Viz: Filterable HTML card grid -> Interaction: Filter buttons and click-to-reveal modals -> Justification: Reduces clutter and allows user-focused discovery. 5. Risk Matrix: Report's Table 3 -> Goal: Assess risks -> Viz: Interactive HTML grid -> Interaction: Hover to highlight and get details -> Justification: Makes dense risk information scannable and digestible. All visualizations are built using Chart.js (Canvas) or structured HTML/CSS, adhering to the NO SVG/Mermaid constraint. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        .modal-backdrop {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-slate-800">
+                <span class="text-teal-600">로봇 산업</span> 투자 대시보드
+            </h1>
+            <div class="hidden md:flex space-x-6 text-sm font-medium">
+                <a href="#catalyst" class="hover:text-teal-600 transition-colors">시장 촉매제</a>
+                <a href="#market" class="hover:text-teal-600 transition-colors">시장 현황</a>
+                <a href="#titans" class="hover:text-teal-600 transition-colors">거인들의 대결</a>
+                <a href="#players" class="hover:text-teal-600 transition-colors">주요 플레이어</a>
+                <a href="#risks" class="hover:text-teal-600 transition-colors">투자와 위험</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 md:py-12">
+
+        <section id="hero" class="text-center mb-16 md:mb-24">
+            <h2 class="text-3xl md:text-5xl font-bold text-slate-800 mb-4">피지컬 AI 시대, 새로운 투자 지평이 열리다</h2>
+            <p class="max-w-3xl mx-auto text-base md:text-lg text-slate-600">
+                로봇 산업은 단순 자동화를 넘어 '피지컬 AI'와 결합하며 사회 전반으로 확장되는 변곡점에 있습니다. 본 대시보드는 정책 변화, 핵심 기술, 주요 기업 전략 및 시장 리스크를 분석하여 성공적인 투자를 위한 인사이트를 제공합니다.
+            </p>
+        </section>
+
+        <section id="catalyst" class="mb-16 md:mb-24">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl md:text-3xl font-bold text-slate-800">시장 촉매제: '노란봉투법'이 가속하는 자동화</h3>
+                <p class="mt-2 max-w-2xl mx-auto text-slate-600">
+                    '노동조합법 개정안'은 노동 리스크를 근본적으로 변화시켜 기업들에게 자동화를 선택이 아닌 생존의 문제로 만들었습니다. 특히 다층적 하청 구조를 가진 산업에서 로봇 도입 수요가 폭발적으로 증가할 것으로 예상됩니다. 아래 산업 카드를 클릭하여 어떤 로봇이 주목받고 있는지 확인해보세요.
+                </p>
+            </div>
+            <div id="industry-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+        </section>
+
+        <section id="market" class="mb-16 md:mb-24">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl md:text-3xl font-bold text-slate-800">시장 현황: 데이터로 보는 성장 궤도</h3>
+                 <p class="mt-2 max-w-2xl mx-auto text-slate-600">
+                    로봇 시장은 괄목할 만한 성장세를 보이고 있으며, 특히 서비스 로봇 분야의 성장이 두드러집니다. 아래 버튼을 통해 산업용 로봇과 서비스 로봇 시장의 성장 전망을 비교해볼 수 있습니다. 범용 휴머노이드 로봇의 등장은 이 시장 규모를 수십 배로 확장시킬 잠재력을 가집니다.
+                </p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <div class="flex justify-center mb-4 space-x-2">
+                    <button id="industrial-btn" class="market-btn bg-teal-600 text-white px-4 py-2 rounded-md text-sm font-semibold">산업용 로봇 시장</button>
+                    <button id="service-btn" class="market-btn bg-slate-200 text-slate-700 px-4 py-2 rounded-md text-sm font-semibold">서비스 로봇 시장</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="marketChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="titans" class="mb-16 md:mb-24">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl md:text-3xl font-bold text-slate-800">거인들의 대결: 테슬라 vs 엔비디아</h3>
+                 <p class="mt-2 max-w-3xl mx-auto text-slate-600">
+                    피지컬 AI의 미래는 두 거인이 제시하는 상반된 비전에 의해 형성되고 있습니다. 모든 것을 통제하는 테슬라의 '수직적 요새'와, 모두에게 무기를 공급하는 엔비디아의 '수평적 제국'. 이는 스마트폰 시대의 'iOS 대 안드로이드' 경쟁을 연상시킵니다.
+                </p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <div id="tesla-card" class="bg-white p-6 rounded-xl shadow-lg h-full"></div>
+                <div id="nvidia-card" class="bg-white p-6 rounded-xl shadow-lg h-full"></div>
+            </div>
+        </section>
+
+        <section id="players" class="mb-16 md:mb-24">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl md:text-3xl font-bold text-slate-800">주요 플레이어: 투자 포트폴리오 가이드</h3>
+                <p class="mt-2 max-w-2xl mx-auto text-slate-600">
+                    글로벌 거인부터 국내 강소기업까지, 로봇 산업의 핵심 기업들을 소개합니다. 필터를 사용하여 관심 있는 기업 그룹을 탐색하고, 각 카드를 클릭하여 상세 정보를 확인하세요.
+                </p>
+            </div>
+            <div class="flex justify-center mb-6 space-x-2">
+                <button class="player-filter-btn bg-teal-600 text-white px-4 py-2 rounded-md text-sm font-semibold" data-filter="all">전체 보기</button>
+                <button class="player-filter-btn bg-slate-200 text-slate-700 px-4 py-2 rounded-md text-sm font-semibold" data-filter="global">글로벌 거인</button>
+                <button class="player-filter-btn bg-slate-200 text-slate-700 px-4 py-2 rounded-md text-sm font-semibold" data-filter="korea">주요 한국 기업</button>
+            </div>
+            <div id="player-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            </div>
+        </section>
+
+        <section id="risks" class="mb-16 md:mb-24">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl md:text-3xl font-bold text-slate-800">투자와 위험: 리스크 매트릭스</h3>
+                <p class="mt-2 max-w-2xl mx-auto text-slate-600">
+                    장기 성장 잠재력에도 불구하고 로봇 산업 투자는 여러 위험 요인을 내포하고 있습니다. 각 리스크 요인에 마우스를 올려 핵심 내용을 확인하고, 투자 결정 시 반드시 고려해야 합니다.
+                </p>
+            </div>
+            <div id="risk-matrix" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-800 text-slate-300 py-8">
+        <div class="container mx-auto px-6 text-center text-sm">
+            <p>&copy; 2025 Interactive Robotics Industry Analysis. All Rights Reserved.</p>
+            <p class="mt-1">본 대시보드는 제공된 보고서 내용을 기반으로 제작된 정보 제공용 애플리케이션입니다.</p>
+        </div>
+    </footer>
+
+    <div id="player-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden modal-backdrop">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto modal-content scale-95">
+            <div id="modal-content-body" class="p-6">
+            </div>
+            <div class="bg-slate-50 px-6 py-3 text-right">
+                <button id="modal-close-btn" class="bg-slate-200 text-slate-700 px-4 py-2 rounded-md text-sm font-semibold hover:bg-slate-300 transition-colors">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const DATA = {
+                industries: [
+                    { name: '자동차 & 조선', risk: '원청의 협력업체 파업 책임 확대', demand: '1~3차 협력업체의 조립 및 부품 이송 자동화', robots: ['협동 로봇 (Cobots)', '자율이동로봇 (AMRs)'] },
+                    { name: '물류 & 창고', risk: '플랫폼/특수고용직 노동자의 단체교섭권 인정', demand: '주문 피킹, 분류, 포장 등 물류센터 전반의 자동화', robots: ['자율이동로봇 (AMRs)', 'GTP 로봇', 'AI 소팅 로봇'] },
+                    { name: '건설 & 제조업', risk: '복잡한 하도급 구조와 높은 산업재해 위험', demand: '철근 조립, 고소 작업, 자재 운반 등 위험 작업 대체', robots: ['건설용 특수 로봇', '다관절 산업용 로봇'] },
+                    { name: '전자', risk: '클린룸 및 정밀 조립 공정의 인력 의존도', demand: '반도체 웨이퍼 이송, 정밀 부품 조립 및 검사', robots: ['웨이퍼 이송 로봇 (WTR)', '스카라 로봇 (SCARA)'] },
+                    { name: '식음료(F&B)', risk: '장기적 인건비 상승 및 노무 리스크 관리', demand: '주방 자동화, 서빙, 고객 응대', robots: ['주방 자동화 로봇', '서빙 로봇'] },
+                    { name: '의료 & 헬스케어', risk: '의료 인력 부족 및 고령화 사회 심화', demand: '정밀 수술 보조, 환자 간병 및 재활', robots: ['수술 보조 로봇', '재활 로봇', '돌봄 로봇'] },
+                ],
+                market: {
+                    industrial: {
+                        labels: ['2024', '2026', '2028', '2030', '2032', '2034'],
+                        data: [177.8, 224.5, 283.5, 358.1, 452.2, 601.4],
+                        label: '산업용 로봇 시장 (억 달러)',
+                        backgroundColor: 'rgba(13, 148, 136, 0.7)',
+                    },
+                    service: {
+                        labels: ['2021', '2022', '2023', '2024', '2025', '2026'],
+                        data: [362, 446, 550, 678, 836, 1033],
+                        label: '서비스 로봇 시장 (억 달러)',
+                        backgroundColor: 'rgba(51, 65, 85, 0.7)',
+                    }
+                },
+                titans: {
+                    tesla: {
+                        name: 'Tesla: 수직적 요새 (Apple/iOS 모델)',
+                        icon: '🤖',
+                        strategy: '수직 계열화',
+                        desc: '하드웨어(옵티머스), 소프트웨어(FSD AI), 데이터를 모두 통제하는 닫힌 생태계. 완벽한 최적화와 성능을 추구합니다.',
+                        items: [
+                            { title: '데이터 소스', content: '수백만 대의 차량에서 수집한 **실제 세계 비디오 데이터**' },
+                            { title: '핵심 강점 (해자)', content: '압도적인 규모의 실제 데이터 및 **엣지 케이스(Edge Case)** 확보' },
+                            { title: '핵심 약점 (리스크)', content: '자체 생산 능력에 따른 확장성 한계, 단일 실패 지점' }
+                        ]
+                    },
+                    nvidia: {
+                        name: 'NVIDIA: 수평적 제국 (Google/Android 모델)',
+                        icon: '🌐',
+                        strategy: '수평적 플랫폼',
+                        desc: 'AI 칩, 소프트웨어(Isaac), 시뮬레이션(Omniverse) 등 핵심 도구를 제공하여 전체 로봇 산업 생태계를 지원합니다.',
+                        items: [
+                            { title: '데이터 소스', content: 'Omniverse 시뮬레이션에서 생성한 **합성 데이터**' },
+                            { title: '핵심 강점 (해자)', content: 'AI 칩 시장의 독점적 지위, 방대한 개발자 생태계' },
+                            { title: '핵심 약점 (리스크)', content: '시뮬레이션과 현실 간의 **도메인 갭(Domain Gap)** 문제' }
+                        ]
+                    }
+                },
+                players: [
+                    { name: 'NVIDIA', category: 'global', logo: 'NVIDIA', desc: '로봇 산업의 \'곡괭이와 삽\'. AI 칩, 시뮬레이션, 파운데이션 모델 등 로봇 개발의 필수 요소를 공급합니다.', details: '특정 로봇의 성공 여부와 무관하게 산업 전체의 성장에서 수익을 창출하는 안정적인 비즈니스 모델을 가집니다. 프로젝트 GR00T와 같은 범용 로봇 모델을 통해 소프트웨어 생태계까지 장악하려 하고 있습니다.' },
+                    { name: 'Tesla', category: 'global', logo: 'TESLA', desc: '피지컬 AI 경쟁의 최종 승리를 목표로 하는 고위험 고수익 투자처. 실제 세계 데이터라는 강력한 해자를 보유하고 있습니다.', details: '완전자율주행(FSD) 기술을 휴머노이드 로봇 \'옵티머스\'에 이식하여 시너지를 창출하는 전략을 구사합니다. 실행 리스크와 높은 밸류에이션이 존재하지만, 성공 시 파급력은 막대할 것입니다.' },
+                    { name: '두산로보틱스', category: 'korea', logo: 'DOOSAN', desc: '협동 로봇 분야의 글로벌 Top 4 기업. 폭넓은 제품 라인업과 강력한 글로벌 판매 채널을 확보하고 있습니다.', details: '협동 로봇 시장의 고성장 잠재력을 고려할 때 매력적입니다. 다만 글로벌 경기 침체로 인한 실적 부진과 수익성 개선이 당면 과제입니다.' },
+                    { name: '레인보우로보틱스', category: 'korea', logo: 'RAINBOW', desc: '삼성전자에 인수된 기술력 중심의 기업. 이족보행 로봇 \'휴보\' 개발 기술을 보유하고 있습니다.', details: '삼성의 자본, 글로벌 판매망, 그리고 거대한 내부 수요처(삼성전자 공장)를 확보하여 강력한 시너지가 기대됩니다. 사실상 삼성의 로봇 R&D 전진기지 역할을 수행하고 있습니다.' },
+                    { name: 'HD현대로보틱스', category: 'korea', logo: 'HD HYUNDAI', desc: '국내 1위 산업용 로봇 제조사. 조선, 자동차 등 현대 그룹의 안정적인 내부 시장을 보유하고 있습니다.', details: '산업 현장에 특화된 로봇 솔루션에서 강점을 보이며, 그룹사와의 협력을 통해 안정적인 성장을 추구합니다.' },
+                    { name: '유진로봇', category: 'korea', logo: 'YUJIN', desc: '자율주행 기반 물류 로봇(AMR) 전문 기업. 스마트 팩토리 및 물류센터 자동화 솔루션을 제공합니다.', details: '노란봉투법 통과 이후 가장 직접적인 수혜가 예상되는 물류 자동화 분야의 핵심 기업 중 하나입니다. 국내외 경쟁 심화에 따른 수익성 확보가 중요합니다.' },
+                ],
+                risks: [
+                    { name: '거시 경제 침체', probability: '높음', impact: '높음', desc: '글로벌 경기 둔화 시 기업들이 고가의 로봇 설비 투자(CAPEX)를 축소하거나 연기할 가능성이 높습니다.' },
+                    { name: '공급망 병목 현상', probability: '높음', impact: '높음', desc: '정밀 감속기, 모터 등 핵심 부품을 소수의 일본, 독일 기업이 과점하고 있어 공급망 불안정성에 취약합니다.' },
+                    { name: '기술적 정체', probability: '중간', impact: '매우 높음', desc: '시제품의 성능과 상용 제품의 안정성 사이의 간극, 즉 \'죽음의 계곡\'을 넘지 못할 경우 산업 전체의 투자 심리가 위축될 수 있습니다.' },
+                    { name: '규제 및 윤리적 장벽', probability: '중간', impact: '높음', desc: '안전, 책임, 고용 문제에 대한 예측 불가능한 신규 규제 도입은 기술 개발과 상용화를 지연시킬 수 있습니다.' },
+                    { name: '높은 초기 비용', probability: '높음', impact: '중간', desc: '높은 시스템 구축 비용은 특히 자금력이 부족한 중소기업의 로봇 도입을 가로막는 주요 장벽입니다.' },
+                ]
+            };
+
+            const industryCardsContainer = document.getElementById('industry-cards');
+            DATA.industries.forEach(industry => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-lg shadow-md cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1';
+                card.innerHTML = `
+                    <h4 class="font-bold text-lg text-slate-800 mb-2">${industry.name}</h4>
+                    <p class="text-sm text-slate-500 mb-3"><strong>주요 리스크:</strong> ${industry.risk}</p>
+                    <div class="details hidden mt-4 border-t pt-3">
+                        <p class="text-sm font-semibold text-teal-700 mb-2">핵심 자동화 요구:</p>
+                        <p class="text-sm text-slate-600 mb-3">${industry.demand}</p>
+                        <p class="text-sm font-semibold text-teal-700 mb-2">주요 로봇 유형:</p>
+                        <ul class="list-disc list-inside text-sm text-slate-600 space-y-1">
+                            ${industry.robots.map(r => `<li>${r}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                card.addEventListener('click', () => {
+                    const details = card.querySelector('.details');
+                    details.classList.toggle('hidden');
+                });
+                industryCardsContainer.appendChild(card);
+            });
+
+            const ctx = document.getElementById('marketChart').getContext('2d');
+            let marketChart;
+            const createOrUpdateChart = (chartData) => {
+                if (marketChart) {
+                    marketChart.data.labels = chartData.labels;
+                    marketChart.data.datasets[0].data = chartData.data;
+                    marketChart.data.datasets[0].label = chartData.label;
+                    marketChart.data.datasets[0].backgroundColor = chartData.backgroundColor;
+                    marketChart.update();
+                } else {
+                    marketChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: chartData.labels,
+                            datasets: [{
+                                label: chartData.label,
+                                data: chartData.data,
+                                backgroundColor: chartData.backgroundColor,
+                                borderRadius: 4,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `${context.dataset.label}: ${context.parsed.y} 억 달러`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: '시장 규모 (억 달러)'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            };
+            
+            const marketBtns = document.querySelectorAll('.market-btn');
+            marketBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    marketBtns.forEach(b => b.classList.replace('bg-teal-600', 'bg-slate-200') || b.classList.replace('text-white', 'text-slate-700'));
+                    btn.classList.replace('bg-slate-200', 'bg-teal-600');
+                    btn.classList.replace('text-slate-700', 'text-white');
+                    const chartType = btn.id.includes('industrial') ? 'industrial' : 'service';
+                    createOrUpdateChart(DATA.market[chartType]);
+                });
+            });
+            document.getElementById('industrial-btn').click();
+
+            const renderTitanCard = (containerId, data) => {
+                const container = document.getElementById(containerId);
+                let itemsHtml = data.items.map(item => `
+                    <div class="mt-4">
+                        <h6 class="font-semibold text-sm text-slate-800">${item.title}</h6>
+                        <p class="text-sm text-slate-600">${item.content.replace(/\*\*(.*?)\*\*/g, '<strong class="text-teal-600">$1</strong>')}</p>
+                    </div>
+                `).join('');
+                container.innerHTML = `
+                    <div class="flex items-center mb-4">
+                        <span class="text-4xl mr-4">${data.icon}</span>
+                        <div>
+                            <h4 class="text-xl font-bold text-slate-800">${data.name}</h4>
+                            <p class="text-sm font-semibold text-teal-600 bg-teal-50 px-2 py-1 rounded inline-block">${data.strategy}</p>
+                        </div>
+                    </div>
+                    <p class="text-slate-600">${data.desc}</p>
+                    <div class="mt-4 border-t border-slate-200 pt-2">${itemsHtml}</div>
+                `;
+            };
+            renderTitanCard('tesla-card', DATA.titans.tesla);
+            renderTitanCard('nvidia-card', DATA.titans.nvidia);
+
+            const playerGrid = document.getElementById('player-grid');
+            const modal = document.getElementById('player-modal');
+            const modalContentBody = document.getElementById('modal-content-body');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+
+            const renderPlayers = (filter = 'all') => {
+                playerGrid.innerHTML = '';
+                const filteredPlayers = filter === 'all' ? DATA.players : DATA.players.filter(p => p.category === filter);
+                filteredPlayers.forEach(player => {
+                    const card = document.createElement('div');
+                    card.className = 'player-card bg-white p-4 rounded-lg shadow-md text-center cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1';
+                    card.dataset.category = player.category;
+                    card.innerHTML = `
+                        <div class="w-16 h-16 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-3 font-bold text-slate-600 text-sm">${player.logo}</div>
+                        <h5 class="font-bold text-slate-800">${player.name}</h5>
+                        <p class="text-sm text-slate-500 mt-1">${player.desc}</p>
+                    `;
+                    card.addEventListener('click', () => {
+                        modalContentBody.innerHTML = `
+                            <div class="flex items-start mb-4">
+                                <div class="w-20 h-20 flex-shrink-0 bg-slate-100 rounded-full flex items-center justify-center mr-4 font-bold text-slate-600 text-lg">${player.logo}</div>
+                                <div>
+                                    <h3 class="text-2xl font-bold text-slate-800">${player.name}</h3>
+                                    <p class="text-base text-slate-500 mt-1">${player.desc}</p>
+                                </div>
+                            </div>
+                            <div class="border-t pt-4">
+                                <h4 class="font-semibold text-slate-800 mb-2">상세 분석</h4>
+                                <p class="text-slate-600 leading-relaxed">${player.details}</p>
+                            </div>
+                        `;
+                        modal.classList.remove('hidden');
+                        setTimeout(() => {
+                           modal.querySelector('.modal-backdrop').classList.remove('opacity-0');
+                           modal.querySelector('.modal-content').classList.remove('scale-95');
+                        }, 10);
+                    });
+                    playerGrid.appendChild(card);
+                });
+            };
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal || e.target === modalCloseBtn) {
+                    modal.querySelector('.modal-backdrop').classList.add('opacity-0');
+                    modal.querySelector('.modal-content').classList.add('scale-95');
+                    setTimeout(() => modal.classList.add('hidden'), 300);
+                }
+            });
+
+            const filterBtns = document.querySelectorAll('.player-filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.replace('bg-teal-600', 'bg-slate-200') || b.classList.replace('text-white', 'text-slate-700'));
+                    btn.classList.replace('bg-slate-200', 'bg-teal-600');
+                    btn.classList.replace('text-slate-700', 'text-white');
+                    renderPlayers(btn.dataset.filter);
+                });
+            });
+            renderPlayers();
+
+            const riskMatrixContainer = document.getElementById('risk-matrix');
+            DATA.risks.forEach(risk => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-5 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:border-teal-500 border-2 border-transparent';
+                card.innerHTML = `
+                    <h5 class="font-bold text-slate-800 mb-2">${risk.name}</h5>
+                    <div class="flex justify-between text-xs mb-3">
+                        <span class="font-semibold bg-red-100 text-red-800 px-2 py-0.5 rounded">발생 확률: ${risk.probability}</span>
+                        <span class="font-semibold bg-orange-100 text-orange-800 px-2 py-0.5 rounded">잠재적 영향: ${risk.impact}</span>
+                    </div>
+                    <p class="text-sm text-slate-600">${risk.desc}</p>
+                `;
+                riskMatrixContainer.appendChild(card);
+            });
+        });
+    </script>
+</body>
+</html>
+
