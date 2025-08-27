@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>비트코인 & 이더리움: 인터랙티브 분석 보고서</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals (Slate, Zinc, Amber) -->
+    <!-- Application Structure Plan: A single-page, section-based scrolling application with a sticky navigation bar. This structure was chosen over a linear document format to allow users non-linear access to key themes: a direct comparison of the two assets, an interactive exploration of geopolitical impacts, and a summary of their core differences. This task-oriented design enhances usability by letting users jump directly to the information they find most relevant, fostering a more engaging and efficient learning experience. -->
+    <!-- Visualization & Content Choices: 
+        1. Report Info: Geopolitical Event Impact Matrix -> Goal: Explore Cause & Effect -> Viz/Method: Interactive button-based content switcher -> Interaction: User clicks a scenario button, the app dynamically displays corresponding impacts on BTC & ETH -> Justification: Transforms a static, dense table into an engaging, exploratory tool, making complex relationships easier to grasp. -> Library/Method: Vanilla JS.
+        2. Report Info: Ethereum's dominant network effects (DeFi TVL, developers) -> Goal: Illustrate Scale & Comparison -> Viz/Method: Vertical Bar Chart -> Interaction: Hover tooltips provide context -> Justification: Visually quantifies the abstract concept of "network effects," making Ethereum's market dominance immediately apparent and impactful. -> Library/Method: Chart.js (Canvas).
+        3. Report Info: Side-by-side comparison table -> Goal: Compare -> Viz/Method: A responsive two-column card grid -> Interaction: Clear visual separation and grouping of related concepts -> Justification: More mobile-friendly and visually scannable than a traditional table, improving readability of comparative data. -> Library/Method: HTML/Tailwind CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #27272a; /* zinc-800 */
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #d97706; /* amber-600 */
+            border-bottom-color: #d97706; /* amber-600 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .scenario-btn {
+            transition: all 0.3s ease;
+        }
+        .scenario-btn.active {
+            background-color: #d97706; /* amber-600 */
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-zinc-800">
+
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-bold text-xl text-amber-600">거대한 분기점</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#intro" class="nav-link px-3 py-2 rounded-md text-sm font-medium">소개</a>
+                        <a href="#analysis" class="nav-link px-3 py-2 rounded-md text-sm font-medium">두 거인 분석</a>
+                        <a href="#geopolitics" class="nav-link px-3 py-2 rounded-md text-sm font-medium">지정학적 체스판</a>
+                        <a href="#comparison" class="nav-link px-3 py-2 rounded-md text-sm font-medium">직접 비교</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="intro" class="py-16 sm:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-4xl font-bold tracking-tight text-zinc-900 sm:text-6xl">비트코인과 이더리움의 미래 항해</h1>
+                <p class="mt-6 text-lg leading-8 text-zinc-600 max-w-3xl mx-auto">급변하는 지정학적, 기술적 환경 속에서 두 디지털 자산의 거인은 각자 다른, 그러나 필연적인 경로를 걷고 있습니다. 이 인터랙티브 보고서는 그들의 고유한 역할과 미래 방향성을 심도 있게 분석합니다.</p>
+            </div>
+        </section>
+
+        <section id="analysis" class="py-16 sm:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">두 거인 분석: 가치와 철학</h2>
+                    <p class="mt-4 text-lg text-zinc-600">비트코인의 '불변성'과 이더리움의 '적응성'은 어떻게 각자의 독보적인 해자를 구축하는지 알아봅니다.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                    <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200">
+                        <h3 class="text-2xl font-bold text-amber-600 mb-4">🪙 비트코인: 디지털 금의 경화(硬化)</h3>
+                        <div class="space-y-6 text-zinc-700">
+                            <div>
+                                <h4 class="font-semibold text-lg mb-1">핵심 정체성: 가치 저장 수단</h4>
+                                <p>완성된 화폐재로서, 비트코인의 가치는 절대적 희소성(2,100만 개)과 불변의 통화 정책에서 나옵니다. 이는 예측 가능하고 견고한 가치 저장소 역할을 수행합니다.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-1">강력한 해자: 변화에 대한 저항</h4>
+                                <p>느리고 신중한 개발 과정과 프로토콜의 경화는 '버그'가 아닌 '기능'입니다. 이는 최고의 보안과 안정성을 보장하며, 기관과 국가가 신뢰할 수 있는 기반이 됩니다.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-1">미래 궤도: 신흥 주권 자산</h4>
+                                <p>제도권 편입(ETF)을 넘어, 탈달러화 시대에 국가들의 중립적 예비 자산으로 자리매김할 잠재력을 가집니다. 이는 글로벌 금융 시스템의 핵심 요소로의 진화를 의미합니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200">
+                        <h3 class="text-2xl font-bold text-blue-600 mb-4">🌐 이더리움: 디지털 신뢰 그리드</h3>
+                        <div class="space-y-6 text-zinc-700">
+                            <div>
+                                <h4 class="font-semibold text-lg mb-1">핵심 정체성: 가치 플랫폼</h4>
+                                <p>탈중앙화 인터넷(Web3)을 위한 기초 신뢰 레이어입니다. DeFi, NFT, 스테이블코인 등 디지털 경제 활동의 기반 인프라 역할을 합니다.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-1">강력한 해자: 네트워크 효과와 진화</h4>
+                                <p>막대한 유동성과 개발자 생태계, 그리고 지속적인 기술 업그레이드(덴쿤, 펙트라)를 통해 경쟁자의 가치 제안을 흡수하며 지배력을 강화합니다.</p>
+                                <div class="mt-4 chart-container">
+                                    <canvas id="networkEffectChart"></canvas>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-1">미래 궤도: 필수불가결한 프로토콜</h4>
+                                <p>인터넷의 TCP/IP처럼, 보이지 않지만 필수적인 '신뢰 그리드'가 되어 가치, 소유권, 정체성의 이전을 중개하는 글로벌 유틸리티로 발전할 것입니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="geopolitics" class="py-16 sm:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">지정학적 체스판</h2>
+                    <p class="mt-4 text-lg text-zinc-600">주요 지정학적 시나리오를 선택하여 비트코인과 이더리움에 미치는 영향을 동적으로 탐색해보세요.</p>
+                </div>
+                <div class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8">
+                    <button class="scenario-btn active px-4 py-2 bg-white border border-slate-300 rounded-full font-semibold text-sm sm:text-base text-zinc-700 shadow-sm" data-scenario="pro-crypto">미국 친암호화폐 규제</button>
+                    <button class="scenario-btn px-4 py-2 bg-white border border-slate-300 rounded-full font-semibold text-sm sm:text-base text-zinc-700 shadow-sm" data-scenario="conflict">주요 군사 분쟁</button>
+                    <button class="scenario-btn px-4 py-2 bg-white border border-slate-300 rounded-full font-semibold text-sm sm:text-base text-zinc-700 shadow-sm" data-scenario="inflation">지속적 고인플레이션</button>
+                    <button class="scenario-btn px-4 py-2 bg-white border border-slate-300 rounded-full font-semibold text-sm sm:text-base text-zinc-700 shadow-sm" data-scenario="privacy">개인 지갑 단속</button>
+                </div>
+                <div id="scenario-display" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                </div>
+            </div>
+        </section>
+
+        <section id="comparison" class="py-16 sm:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">직접 비교: 목적과 설계의 이분법</h2>
+                    <p class="mt-4 text-lg text-zinc-600">두 자산의 핵심적인 차이점을 한눈에 비교하여 그들의 근본적인 이분법을 이해합니다.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                        <h4 class="font-bold text-lg mb-3">핵심 기능</h4>
+                        <p class="text-sm text-amber-600 font-semibold mb-1">비트코인:</p>
+                        <p class="text-sm text-zinc-600 mb-2">가치 저장 (디지털 금)</p>
+                        <p class="text-sm text-blue-600 font-semibold mb-1">이더리움:</p>
+                        <p class="text-sm text-zinc-600">가치 플랫폼 (월드 컴퓨터)</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                        <h4 class="font-bold text-lg mb-3">가치 축적 방식</h4>
+                        <p class="text-sm text-amber-600 font-semibold mb-1">비트코인:</p>
+                        <p class="text-sm text-zinc-600 mb-2">화폐 프리미엄 (절대적 희소성)</p>
+                        <p class="text-sm text-blue-600 font-semibold mb-1">이더리움:</p>
+                        <p class="text-sm text-zinc-600">블록 공간 수요 및 스테이킹 수익</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                        <h4 class="font-bold text-lg mb-3">기술 철학</h4>
+                        <p class="text-sm text-amber-600 font-semibold mb-1">비트코인:</p>
+                        <p class="text-sm text-zinc-600 mb-2">경화와 안정성 (보수적 진화)</p>
+                        <p class="text-sm text-blue-600 font-semibold mb-1">이더리움:</p>
+                        <p class="text-sm text-zinc-600">적응적 진화와 확장성 (공격적 혁신)</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                        <h4 class="font-bold text-lg mb-3">지정학적 역할</h4>
+                        <p class="text-sm text-amber-600 font-semibold mb-1">비트코인:</p>
+                        <p class="text-sm text-zinc-600 mb-2">신흥 주권 예비 자산</p>
+                        <p class="text-sm text-blue-600 font-semibold mb-1">이더리움:</p>
+                        <p class="text-sm text-zinc-600">초국가적 시스템을 위한 플랫폼</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                        <h4 class="font-bold text-lg mb-3">주요 리스크</h4>
+                        <p class="text-sm text-amber-600 font-semibold mb-1">비트코인:</p>
+                        <p class="text-sm text-zinc-600 mb-2">거시 경제와의 상관관계, 규제 공격</p>
+                        <p class="text-sm text-blue-600 font-semibold mb-1">이더리움:</p>
+                        <p class="text-sm text-zinc-600">기술 실행 리스크, 중앙화 벡터</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                        <h4 class="font-bold text-lg mb-3">핵심 차별점</h4>
+                        <p class="text-sm text-amber-600 font-semibold mb-1">비트코인:</p>
+                        <p class="text-sm text-zinc-600 mb-2">탈중앙성과 불변의 통화 정책</p>
+                        <p class="text-sm text-blue-600 font-semibold mb-1">이더리움:</p>
+                        <p class="text-sm text-zinc-600">지배적 네트워크 효과와 기술 로드맵</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-zinc-800 text-white">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 text-center">
+            <p>본 보고서는 제공된 정보를 바탕으로 제작된 인터랙티브 분석 자료입니다.</p>
+            <p class="text-sm text-zinc-400 mt-2">투자에 대한 결정은 본인의 판단과 책임 하에 이루어져야 합니다.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const scenarioData = {
+                'pro-crypto': {
+                    btc: {
+                        title: '🪙 비트코인: 긍정적',
+                        text: "'미국 전략 자산'으로 내러티브가 전환됩니다. 401(k), ETF를 통한 기관 채택이 증가하며 가격이 미국 정책과 더 높은 상관관계를 보이게 됩니다."
+                    },
+                    eth: {
+                        title: '🌐 이더리움: 중립적-긍정적',
+                        text: "규제 명확성은 전체 생태계에 이롭습니다. 국가 정책의 초점은 비트코인에 맞춰지지만, 전반적인 시장 강세로 네트워크 사용량이 증가할 수 있습니다."
+                    }
+                },
+                'conflict': {
+                    btc: {
+                        title: '🪙 비트코인: 단기 부정적, 장기 긍정적',
+                        text: "단기적으로는 '위험 자산'으로 행동하며 미 달러 유동성으로의 도피 현상 속에서 매도될 수 있습니다. 장기적으로는 국가 통제 밖 비주권 자산의 필요성을 강화합니다."
+                    },
+                    eth: {
+                        title: '🌐 이더리움: 부정적',
+                        text: "고베타 위험 자산으로 행동합니다. 사용자들이 위험을 회피하고 스테이블코인이나 오프체인으로 이동함에 따라 디파이 활동이 감소할 수 있습니다."
+                    }
+                },
+                'inflation': {
+                    btc: {
+                        title: '🪙 비트코인: 매우 긍정적',
+                        text: "통화 가치 하락에 대한 헤지라는 핵심 사용 사례가 활성화됩니다. 구매력 보존을 원하는 투자자로부터 막대한 자본이 유입될 수 있습니다."
+                    },
+                    eth: {
+                        title: '🌐 이더리움: 긍정적',
+                        text: "전체 암호화폐 시장에 긍정적입니다. 디파이 수익률이 전통 금융 대비 더 매력적으로 변하고, 이더리움 상 스테이블코인 사용이 증가할 수 있습니다."
+                    }
+                },
+                'privacy': {
+                    btc: {
+                        title: '🪙 비트코인: 부정적',
+                        text: "검열 저항성이라는 핵심 가치 제안을 위협합니다. 가격 영향은 단속의 심각성과 지리적 범위에 따라 달라질 것입니다."
+                    },
+                    eth: {
+                        title: '🌐 이더리움: 매우 부정적',
+                        text: "전체 디파이 및 웹3 생태계는 개인 지갑에 의존합니다. 심각한 단속은 네트워크의 유용성에 대한 실존적 위협이 될 수 있습니다."
+                    }
+                }
+            };
+
+            const scenarioDisplay = document.getElementById('scenario-display');
+            const scenarioButtons = document.querySelectorAll('.scenario-btn');
+
+            function updateScenario(scenario) {
+                const data = scenarioData[scenario];
+                scenarioDisplay.innerHTML = `
+                    <div class="bg-slate-50 p-6 rounded-lg border border-slate-200">
+                        <h4 class="font-bold text-lg mb-2 text-amber-600">${data.btc.title}</h4>
+                        <p class="text-zinc-600">${data.btc.text}</p>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-lg border border-slate-200">
+                        <h4 class="font-bold text-lg mb-2 text-blue-600">${data.eth.title}</h4>
+                        <p class="text-zinc-600">${data.eth.text}</p>
+                    </div>
+                `;
+            }
+
+            scenarioButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    scenarioButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    const scenario = button.dataset.scenario;
+                    updateScenario(scenario);
+                });
+            });
+
+            updateScenario('pro-crypto');
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.4
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', e => {
+                    e.preventDefault();
+                    document.querySelector(link.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            const ctx = document.getElementById('networkEffectChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['DeFi TVL', '개발자 활동', '스테이블코인 거래량'],
+                    datasets: [{
+                        label: '이더리움 생태계',
+                        data: [95, 90, 85],
+                        backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: '기타 L1 경쟁자 합산',
+                        data: [35, 40, 30],
+                        backgroundColor: 'rgba(203, 213, 225, 0.7)',
+                        borderColor: 'rgba(203, 213, 225, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '이더리움의 네트워크 효과 (개념적 비교)',
+                            font: { size: 16, weight: 'bold' },
+                            color: '#334155'
+                        },
+                        tooltip: {
+                            backgroundColor: '#18181b',
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 12 },
+                            padding: 10,
+                            cornerRadius: 4
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#e2e8f0'
+                            },
+                            ticks: {
+                                color: '#475569'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#475569'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
