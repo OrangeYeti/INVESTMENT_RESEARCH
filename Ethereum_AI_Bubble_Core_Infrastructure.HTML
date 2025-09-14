@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이더리움 투자 분석 대시보드</title>
+    <!-- Chosen Palette: Calm Tech (Light Beige/Off-white background, Dark Grey text, with Blue and Green accents for charts and highlights) -->
+    <!-- Application Structure Plan: A single-page, scrolling application with a sticky top navigation bar. The structure guides the user through a logical narrative mirroring the report's flow: 1. Introduction, 2. Core Value (Part 1), 3. Growth Engine (Part 2), 4. Mainstream Adoption (Part 3), and 5. Synthesis & Outlook (Part 4). This linear, scroll-based navigation is chosen for its intuitive user experience, allowing the complex investment thesis to unfold step-by-step like a story. Interactions include smooth scrolling, active navigation highlighting, and a toggle in the final section to switch between the investment outlook and key risks, encouraging user exploration. -->
+    <!-- Visualization & Content Choices:
+    - Part 1 (Core Value): Goal: Compare. Viz: Horizontal Bar Chart (Chart.js) to compare Ethereum's developer ecosystem and security against competitors. Justification: Bar charts are excellent for direct comparison of metrics.
+    - Part 2 (Growth Engine): Goal: Change & Compare. Viz: A dual-pane section. Left pane shows a Line Chart (Chart.js) for 'Supply Shock' (ETH supply change over time). Right pane shows a Stacked Bar Chart (Chart.js) for 'Demand Drivers' (composition of gas fee sources). Justification: Line chart clearly shows the trend of supply reduction. Stacked bar chart effectively breaks down the components of demand.
+    - Part 3 (Adoption): Goal: Organize. Viz: HTML/CSS based timeline/flow diagram to illustrate the process from regulatory uncertainty to institutional inflow. Justification: A visual flow is more intuitive for showing a process than pure text.
+    - Part 4 (Outlook): Goal: Compare. Viz: Vertical Bar Chart (Chart.js) comparing projected returns of ETH vs. other assets. Interaction: A button toggles the visibility of a "Risk Factors" list. Justification: Bar chart provides a clear comparison of potential returns, and the interactive toggle allows users to focus on the outlook first, then explore risks on demand.
+    - All charts use Chart.js on Canvas. No SVG or Mermaid JS is used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F8F9FA;
+            color: #212529;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #0077b6;
+            border-bottom-color: #0077b6;
+        }
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .btn-primary {
+            background-color: #0077b6;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #023e8a;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .btn-secondary:hover {
+             background-color: #343a40;
+        }
+    </style>
+</head>
+<body>
+
+    <header id="navbar" class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-2xl font-bold text-gray-800">
+                <span class="text-[#0077b6]">ETH</span> Analysis
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#part1" class="nav-link font-medium text-gray-600 pb-1">핵심 가치</a>
+                <a href="#part2" class="nav-link font-medium text-gray-600 pb-1">성장 동력</a>
+                <a href="#part3" class="nav-link font-medium text-gray-600 pb-1">제도권 편입</a>
+                <a href="#part4" class="nav-link font-medium text-gray-600 pb-1">종합 전망</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="intro" class="text-center py-16">
+            <h1 class="text-4xl md:text-5xl font-black text-gray-800 mb-4">이더리움, 다가오는 AI 버블의 핵심 인프라인가?</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">트럼프 2기 행정부, 미국 중심의 AI 버블, 스테이블 코인의 역할이라는 거시적 투자 관점을 기반으로 이더리움의 내재 가치부터 시장 촉매제, 최종 가격 전망까지 논리적으로 분석합니다.</p>
+        </section>
+
+        <section id="part1" class="mb-16 scroll-mt-20">
+            <div class="card rounded-xl p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Part 1: 이더리움의 본질과 역할</h2>
+                <p class="text-gray-600 mb-8">이더리움은 단순한 '코인'을 넘어 '글로벌 결제 레이어'이자 '탈중앙 슈퍼컴퓨터'로서 기능합니다. 수많은 경쟁자의 도전에도 불구하고 강력한 네트워크 효과, 보안성, 그리고 압도적인 개발자 생태계를 바탕으로 블록체인 산업의 '대장주' 자리를 굳건히 지키고 있습니다.</p>
+                <div class="chart-container">
+                    <canvas id="competitiveAdvantageChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="part2" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">Part 2: 가격 상승의 내재적 동력</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="card rounded-xl p-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">2-1. 공급 충격 (Supply Shock)</h3>
+                    <p class="text-gray-600 mb-4">'울트라 사운드 머니' 개념에 따라 이더리움은 네트워크 사용량이 늘수록 소각되어 총량이 감소합니다. 이는 비트코인보다 더 강력한 디플레이션 메커니즘으로 작용하며, 스테이킹된 물량까지 더해져 시장의 유통량을 크게 줄입니다.</p>
+                    <div class="chart-container h-80">
+                        <canvas id="supplyShockChart"></canvas>
+                    </div>
+                </div>
+                <div class="card rounded-xl p-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">2-2. 수요 견인 (Demand Drivers)</h3>
+                    <p class="text-gray-600 mb-4">스테이블 코인 시장의 확장과 레이어2 생태계의 성장은 ETH의 본질적인 수요를 견인합니다. 모든 레이어2 거래는 최종적으로 이더리움 메인넷에 기록되어야 하므로, 생태계가 커질수록 ETH 가스비 수요는 필연적으로 증가합니다.</p>
+                     <div class="chart-container h-80">
+                        <canvas id="demandDriversChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="part3" class="mb-16 scroll-mt-20">
+            <div class="card rounded-xl p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Part 3: 제도권 편입과 거시적 순풍</h2>
+                <p class="text-gray-600 mb-8">미국의 'FIT21 법안' 통과와 현물 ETF 승인은 이더리움의 증권성 리스크를 해소하고 기관 투자자들의 자금이 시장으로 유입될 수 있는 공식적인 통로를 마련했습니다. 이는 이더리움이 주류 금융 자산으로 인정받는 중요한 변곡점입니다.</p>
+                <div class="w-full max-w-4xl mx-auto">
+                    <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4">
+                        <div class="text-center p-4 rounded-lg bg-gray-100 w-full md:w-1/4">
+                            <div class="text-4xl mb-2">🏛️</div>
+                            <h4 class="font-bold">규제 명확화</h4>
+                            <p class="text-sm text-gray-600">FIT21 법안 통과</p>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-400">&rarr;</div>
+                        <div class="text-center p-4 rounded-lg bg-gray-100 w-full md:w-1/4">
+                            <div class="text-4xl mb-2">📈</div>
+                            <h4 class="font-bold">상품성 인정</h4>
+                            <p class="text-sm text-gray-600">현물 ETF 승인</p>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-400">&rarr;</div>
+                        <div class="text-center p-4 rounded-lg bg-gray-100 w-full md:w-1/4">
+                            <div class="text-4xl mb-2">🏦</div>
+                            <h4 class="font-bold">기관 자금 유입</h4>
+                            <p class="text-sm text-gray-600">새로운 자금 유입</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="part4" class="scroll-mt-20">
+            <div class="card rounded-xl p-6 md:p-8">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Part 4: 종합 분석 및 가격 전망</h2>
+                        <p class="text-gray-600">친(親)암호화폐 정책과 AI 산업 육성이 결합된 거시 환경 속에서 이더리움의 잠재력과 리스크를 종합적으로 분석합니다.</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="showOutlookBtn" class="btn-primary px-4 py-2 rounded-lg font-semibold">전망</button>
+                        <button id="showRisksBtn" class="btn-secondary px-4 py-2 rounded-lg font-semibold">리스크</button>
+                    </div>
+                </div>
+
+                <div id="outlookContent">
+                    <h3 class="text-xl font-bold text-gray-800 mt-6 mb-4">트럼프 2기 행정부 시나리오 속 자산군별 예상 상승률 비교</h3>
+                    <p class="text-gray-600 mb-6">AI 버블 시나리오에서 이더리움은 AI 에이전트 간의 경제 활동을 위한 핵심 인프라로 자리매김하며, 전통적인 AI 주식이나 비트코인 대비 높은 상승률을 기록할 잠재력을 가집니다.</p>
+                    <div class="chart-container">
+                        <canvas id="assetComparisonChart"></canvas>
+                    </div>
+                </div>
+
+                <div id="risksContent" class="hidden">
+                    <h3 class="text-xl font-bold text-red-700 mt-6 mb-4">주요 리스크 분석</h3>
+                    <ul class="space-y-4 text-gray-700">
+                        <li class="p-4 bg-red-50 rounded-lg border-l-4 border-red-500">
+                            <strong class="font-semibold text-red-800">경쟁자의 약진:</strong> 솔라나 등 고성능 레이어1 블록체인들이 지속적으로 시장 점유율을 위협하며 이더리움의 지배력을 약화시킬 수 있습니다.
+                        </li>
+                        <li class="p-4 bg-orange-50 rounded-lg border-l-4 border-orange-500">
+                            <strong class="font-semibold text-orange-800">규제 불확실성:</strong> 현물 ETF가 승인되었음에도 불구하고, 스테이킹 서비스나 디파이(DeFi)에 대한 추가적인 규제가 이더리움 생태계의 성장을 저해할 수 있습니다.
+                        </li>
+                        <li class="p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-500">
+                            <strong class="font-semibold text-yellow-800">기술적 리스크:</strong> 덴쿤 업그레이드 이후에도 네트워크 확장성을 위한 지속적인 기술 개발이 필요하며, 이 과정에서 예기치 못한 버그나 중앙화 리스크가 발생할 수 있습니다.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="text-center py-8 text-gray-500 text-sm">
+        <p>본 자료는 투자 조언이 아니며, 제공된 정보를 바탕으로 한 가상 시나리오 분석입니다. 모든 투자의 책임은 본인에게 있습니다.</p>
+    </footer>
+
+    <script>
+        const chartTextColor = '#343a40';
+        const gridColor = '#dee2e6';
+
+        const wrapLabel = (label) => {
+            const maxLength = 16;
+            if (typeof label !== 'string' || label.length <= maxLength) return label;
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            words.forEach(word => {
+                if ((currentLine + ' ' + word).trim().length > maxLength) {
+                    lines.push(currentLine.trim());
+                    currentLine = word;
+                } else {
+                    currentLine = (currentLine + ' ' + word).trim();
+                }
+            });
+            if (currentLine) lines.push(currentLine.trim());
+            return lines;
+        };
+
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            return Array.isArray(label) ? label.join(' ') : label;
+        };
+        
+        const defaultChartOptions = {
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: chartTextColor, font: { size: 12 }}},
+                tooltip: { callbacks: { title: tooltipTitleCallback }, bodyFont: { size: 14 }, titleFont: { size: 16 }}
+            },
+            scales: {
+                y: { ticks: { color: chartTextColor }, grid: { color: gridColor }},
+                x: { ticks: { color: chartTextColor }, grid: { color: 'transparent' }}
+            }
+        };
+
+        const competitiveAdvantageLabels = ['활성 개발자 수 (명)', '총 예치 자산 (십억 $)', '네트워크 보안 (십억 $)'];
+        new Chart(document.getElementById('competitiveAdvantageChart'), {
+            type: 'bar',
+            data: {
+                labels: competitiveAdvantageLabels.map(wrapLabel),
+                datasets: [{
+                    label: '이더리움',
+                    data: [7800, 85, 115],
+                    backgroundColor: 'rgba(0, 119, 182, 0.7)',
+                    borderColor: 'rgba(0, 119, 182, 1)',
+                    borderWidth: 1
+                }, {
+                    label: '경쟁 체인 평균',
+                    data: [1200, 15, 20],
+                    backgroundColor: 'rgba(108, 117, 125, 0.7)',
+                    borderColor: 'rgba(108, 117, 125, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: { ...defaultChartOptions, indexAxis: 'y' }
+        });
+
+        const supplyShockLabels = ['2022-Q2', '2023-Q1', '2023-Q4', '2024-Q3', '2025-Q2'];
+        new Chart(document.getElementById('supplyShockChart'), {
+            type: 'line',
+            data: {
+                labels: supplyShockLabels,
+                datasets: [{
+                    label: 'ETH 연간 공급 변화율 (%)',
+                    data: [4.1, 0.5, 0.1, -0.25, -0.6],
+                    fill: true,
+                    backgroundColor: 'rgba(201, 23, 58, 0.1)',
+                    borderColor: '#c9173a',
+                    tension: 0.3
+                }]
+            },
+            options: defaultChartOptions
+        });
+
+        const demandDriversLabels = ['2023-Q1', '2023-Q4', '2024-Q3', '2025-Q2'];
+        new Chart(document.getElementById('demandDriversChart'), {
+            type: 'bar',
+            data: {
+                labels: demandDriversLabels,
+                datasets: [{
+                    label: '레이어2 가스비 수요',
+                    data: [15, 25, 40, 75],
+                    backgroundColor: '#0077b6',
+                }, {
+                    label: '스테이블코인 가스비 수요',
+                    data: [40, 45, 50, 60],
+                    backgroundColor: '#00b4d8',
+                }, {
+                    label: '기타 (DeFi, NFT 등)',
+                    data: [45, 30, 25, 20],
+                    backgroundColor: '#adb5bd',
+                }]
+            },
+            options: {
+                ...defaultChartOptions,
+                scales: {
+                    x: { stacked: true, ...defaultChartOptions.scales.x },
+                    y: { stacked: true, ...defaultChartOptions.scales.y }
+                }
+            }
+        });
+
+        const assetComparisonLabels = ['미국 AI 주식', '비트코인', '이더리움'];
+        new Chart(document.getElementById('assetComparisonChart'), {
+            type: 'bar',
+            data: {
+                labels: assetComparisonLabels.map(wrapLabel),
+                datasets: [{
+                    label: '18개월 예상 상승률 (%)',
+                    data: [150, 300, 550],
+                    backgroundColor: ['#6c757d', '#fca311', '#0077b6'],
+                }]
+            },
+            options: defaultChartOptions
+        });
+
+        const showOutlookBtn = document.getElementById('showOutlookBtn');
+        const showRisksBtn = document.getElementById('showRisksBtn');
+        const outlookContent = document.getElementById('outlookContent');
+        const risksContent = document.getElementById('risksContent');
+
+        showOutlookBtn.addEventListener('click', () => {
+            outlookContent.classList.remove('hidden');
+            risksContent.classList.add('hidden');
+            showOutlookBtn.classList.replace('btn-secondary', 'btn-primary');
+            showRisksBtn.classList.replace('btn-primary', 'btn-secondary');
+        });
+
+        showRisksBtn.addEventListener('click', () => {
+            outlookContent.classList.add('hidden');
+            risksContent.classList.remove('hidden');
+            showRisksBtn.classList.replace('btn-secondary', 'btn-primary');
+            showOutlookBtn.classList.replace('btn-primary', 'btn-secondary');
+        });
+        
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href').substring(1) === entry.target.id) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { rootMargin: '-50% 0px -50% 0px' });
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+    </script>
+</body>
+</html>
+
